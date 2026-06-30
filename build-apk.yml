@@ -1,0 +1,45 @@
+name: Android APK Olustur
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ana
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Zip dosyasini cikar
+        run: |
+          unzip -q altay_paranormal_flutter_starter_mobile_build.zip
+          ls -la
+
+      - name: Flutter kur
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Android dosyalarini olustur
+        working-directory: altay_paranormal_app
+        run: flutter create . --platforms=android --org com.altayaytin
+
+      - name: Paketleri indir
+        working-directory: altay_paranormal_app
+        run: flutter pub get
+
+      - name: APK olustur
+        working-directory: altay_paranormal_app
+        run: flutter build apk --release
+
+      - name: APK dosyasini yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: altay-paranormal-apk
+          path: altay_paranormal_app/build/app/outputs/flutter-apk/app-release.apk
